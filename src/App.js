@@ -1,25 +1,62 @@
-import logo from './logo.svg';
 import './App.css';
+import {Component} from 'react'
+import MovieInfo from './components/MovieInfo';
 
-function App() {
+class App extends Component {
+  state = {
+    baseURL: 'http://www.omdbapi.com/?',
+    apikey: 'apikey=e228fed2',
+    query: '&t=',
+    movieTitle: '',
+    searchURL: '',
+    movie: null
+  };
+
+  handleChange = (event) => {
+    this.setState({ [event.target.id]: event.target.value})
+  };
+  handleSubmit = (event) =>{
+    event.preventDefault()
+    this.setState({
+      searchURL: 
+      this.state.baseURL + 
+      this.state.apikey + 
+      this.state.query + 
+      this.state.movieTitle,
+    }, () => {
+      fetch(this.state.searchURL)
+      .then(res => res.json())
+      .then(json => this.setState({
+        movie: json,
+        movieTitle: ''
+      }))
+    });
+  };
+
+  
+  render() {
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <h1>Movies APP</h1>
+
+      <form onSubmit={this.handleSubmit}>
+        <label htmlFor='movieTitle'>Title</label>
+        <input 
+          id='movieTitle'
+          type='text'
+          value={this.state.movieTitle}
+          onChange={this.handleChange}
+        />
+        <input 
+          type='submit'
+        />
+      </form>
+      <a href={this.state.searchURL}>{this.state.searchURL}</a>
+
+      {this.state.movie && <MovieInfo movie={this.state.movie} />}
     </div>
   );
+  }
 }
 
 export default App;
